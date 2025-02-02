@@ -12,6 +12,15 @@
         h1 {
             text-align: center;
         }
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+        button {
+            display: block;
+            margin: 20px auto;
+        }
         ul {
             list-style-type: none;
             padding: 0;
@@ -23,21 +32,16 @@
 </head>
 <body>
     <h1>Tracklist Musicale</h1>
+    <textarea id="inputTracklist" placeholder="Inserisci fino a 50 canzoni, una per riga..."></textarea>
+    <button onclick="processTracklist()">Correggi Tracklist</button>
+    <h2>Tracklist Corretta</h2>
     <ul id="tracklist"></ul>
 
     <script>
-        // Lista di canzoni con ripetizioni
-        const tracklist = [
-            "Canzone A",
-            "Canzone B",
-            "Canzone C",
-            "Canzone A",  // Ripetizione
-            "Canzone D",
-            "Canzone B"   // Ripetizione
-        ];
+        function processTracklist() {
+            const input = document.getElementById('inputTracklist').value;
+            const tracklist = input.split('\n').map(track => track.trim()).filter(track => track !== '');
 
-        // Funzione per processare la tracklist
-        function processTracklist(tracklist) {
             const uniqueTracks = [];
             tracklist.forEach(track => {
                 if (!uniqueTracks.includes(track)) {
@@ -45,19 +49,15 @@
                 }
             });
 
-            return uniqueTracks.map((track, index) => `${index + 1}. ${track}`);
+            const tracklistElement = document.getElementById('tracklist');
+            tracklistElement.innerHTML = '';
+
+            uniqueTracks.forEach((track, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${index + 1}. ${track}`;
+                tracklistElement.appendChild(li);
+            });
         }
-
-        // Processa la tracklist
-        const processedTracklist = processTracklist(tracklist);
-
-        // Mostra la tracklist processata nella pagina
-        const tracklistElement = document.getElementById('tracklist');
-        processedTracklist.forEach(track => {
-            const li = document.createElement('li');
-            li.textContent = track;
-            tracklistElement.appendChild(li);
-        });
     </script>
 </body>
 </html>
