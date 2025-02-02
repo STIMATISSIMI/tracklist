@@ -19,48 +19,54 @@
             background-color: #f0f0f0;
             padding: 10px;
         }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
     <h1>Tracklist Formatter</h1>
     <textarea id="inputTracklist" placeholder="Incolla qui la tracklist..."></textarea>
     <button onclick="formatTracklist()">Formatta Tracklist</button>
+    <button onclick="copyToClipboard()">Copia Tracklist</button>
     <div class="output" id="outputTracklist"></div>
 
     <script>
         function formatTracklist() {
             const input = document.getElementById('inputTracklist').value;
-            const lines = input.split('\n');
+            const mainArtist = "The Weeknd"; // Sostituisci con l'artista principale
+            const lines = input.split(/(?=\d+\.\s)/); // Divide per traccia numerata
             const formattedLines = [];
-            let currentTrack = '';
-
+            
             lines.forEach((line, index) => {
                 if (line.trim() === '') return; // Salta le righe vuote
 
-                // Rimuovere la numerazione esistente e minutaggio
+                // Rimuove il flag di esplicitazione
+                line = line.replace(/^E\s*/, '').trim();
+                // Rimuove la numerazione esistente
                 line = line.replace(/^\d+\.\s*/, '').trim();
+                // Rimuove il minutaggio se presente
                 line = line.replace(/\d{1,2}:\d{2}/, '').trim();
-
-                // Concatenare le righe se necessario
-                if (currentTrack === '') {
-                    currentTrack = line;
-                } else {
-                    currentTrack += ` ${line}`;
-                }
-
-                // Aggiungi la traccia completa se si tratta dell'ultima parte della traccia
-                if (/^\d{1,2}:\d{2}$/.test(line.trim())) {
-                    formattedLines.push(`${String(formattedLines.length + 1).padStart(2, '0')}. ${currentTrack.trim()}`);
-                    currentTrack = '';
-                }
+                // Rimuove l'artista principale ripetuto
+                line = line.replace(new RegExp(`\\b${mainArtist}\\b,?\\s*`, 'gi'), '').trim();
+                // Gestisce i featuring
+                line = line.replace(/feat\./gi, '(feat.');
+                // Prepara la traccia formattata
+                formattedLines.push(`${String(index + 1).padStart(2, '0')}. ${line}`);
             });
 
-            // Aggiungi l'ultima traccia se esiste
-            if (currentTrack.trim() !== '') {
-                formattedLines.push(`${String(formattedLines.length + 1).padStart(2, '0')}. ${currentTrack.trim()}`);
-            }
-
             document.getElementById('outputTracklist').textContent = formattedLines.join('\n');
+        }
+
+        function copyToClipboard() {
+            const outputTracklist = document.getElementById('outputTracklist').textContent;
+            navigator.clipboard.writeText(outputTracklist).then(() => {
+                alert('Tracklist copiata negli appunti!');
+            }).catch(err => {
+                console.error('Errore nel copiare la tracklist: ', err);
+            });
         }
     </script>
 </body>
