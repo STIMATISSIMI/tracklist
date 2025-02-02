@@ -6,48 +6,67 @@
     <title>Tracklist Musicale</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #121212;
-            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1e1e1e;
+            color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
         }
         h1, h2 {
-            text-align: center;
-            color: #ffffff;
+            color: #f0f0f0;
         }
         textarea {
-            width: 100%;
+            width: 90%;
+            max-width: 600px;
             height: 200px;
             margin-bottom: 20px;
-            background-color: #333333;
-            color: #ffffff;
+            background-color: #2d2d2d;
+            color: #f0f0f0;
             border: 1px solid #444444;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
         }
         button {
-            display: block;
-            margin: 20px auto;
+            display: inline-block;
+            margin: 10px 5px;
             padding: 10px 20px;
-            background-color: #444444;
+            background-color: #007acc;
             color: #ffffff;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
-            background-color: #555555;
+            background-color: #005f99;
         }
         ul {
             list-style-type: none;
             padding: 0;
+            width: 90%;
+            max-width: 600px;
         }
         li {
             margin: 5px 0;
+            background-color: #2d2d2d;
+            padding: 10px;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
     <h1>Tracklist Musicale</h1>
     <textarea id="inputTracklist" placeholder="Inserisci la tracklist da Spotify qui..."></textarea>
-    <button onclick="processTracklist()">Correggi Tracklist</button>
+    <div>
+        <button onclick="processTracklist()">Correggi Tracklist</button>
+        <button onclick="copyTracklist()">Copia Tracklist</button>
+    </div>
     <h2>Tracklist Corretta</h2>
     <ul id="tracklist"></ul>
 
@@ -85,6 +104,16 @@
                 const li = document.createElement('li');
                 li.textContent = `${(index + 1).toString().padStart(2, '0')}. ${track}`;
                 tracklistElement.appendChild(li);
+            });
+        }
+
+        function copyTracklist() {
+            const tracklistElement = document.getElementById('tracklist');
+            const tracklistText = Array.from(tracklistElement.children).map(li => li.textContent).join('\n');
+            navigator.clipboard.writeText(tracklistText).then(() => {
+                alert('Tracklist copiata negli appunti!');
+            }, (err) => {
+                alert('Errore durante la copia della tracklist: ', err);
             });
         }
     </script>
