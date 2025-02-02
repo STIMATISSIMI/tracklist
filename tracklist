@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracklist Musicale</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tracklist Musicale</h1>
+    <ul id="tracklist"></ul>
+
+    <script>
+        // Lista di canzoni con ripetizioni
+        const tracklist = [
+            "Canzone A",
+            "Canzone B",
+            "Canzone C",
+            "Canzone A",  // Ripetizione
+            "Canzone D",
+            "Canzone B"   // Ripetizione
+        ];
+
+        // Funzione per processare la tracklist
+        function processTracklist(tracklist) {
+            const uniqueTracks = [];
+            tracklist.forEach(track => {
+                if (!uniqueTracks.includes(track)) {
+                    uniqueTracks.push(track);
+                }
+            });
+
+            return uniqueTracks.map((track, index) => `${index + 1}. ${track}`);
+        }
+
+        // Processa la tracklist
+        const processedTracklist = processTracklist(tracklist);
+
+        // Mostra la tracklist processata nella pagina
+        const tracklistElement = document.getElementById('tracklist');
+        processedTracklist.forEach(track => {
+            const li = document.createElement('li');
+            li.textContent = track;
+            tracklistElement.appendChild(li);
+        });
+    </script>
+</body>
+</html>
