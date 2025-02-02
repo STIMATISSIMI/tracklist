@@ -32,7 +32,7 @@
 </head>
 <body>
     <h1>Tracklist Musicale</h1>
-    <textarea id="inputTracklist" placeholder="Inserisci fino a 50 canzoni, una per riga..."></textarea>
+    <textarea id="inputTracklist" placeholder="Inserisci la tracklist da Spotify qui..."></textarea>
     <button onclick="processTracklist()">Correggi Tracklist</button>
     <h2>Tracklist Corretta</h2>
     <ul id="tracklist"></ul>
@@ -40,11 +40,49 @@
     <script>
         function processTracklist() {
             const input = document.getElementById('inputTracklist').value;
-            const tracklist = input.split('\n').map(track => track.trim()).filter(track => track !== '');
+            const lines = input.split('\n').map(line => line.trim()).filter(line => line !== '');
+
+            const tracklist = [];
+            let currentTitle = '';
+            let currentArtists = '';
+
+            lines.forEach(line => {
+                if (line.startsWith('E')) {
+                    // Salta linee che iniziano con "E"
+                    return;
+                }
+
+                // Se la linea contiene un tempo, è una canzone completa
+                if (/^\d{2}:\d{2}$/.test(line)) {
+                    // Aggiungi la canzone alla tracklist
+                    if (currentTitle) {
+                        tracklist.push({ title: currentTitle, artists: currentArtists });
+                    }
+                    currentTitle = '';
+                    currentArtists = '';
+                } else {
+                    // Se la linea contiene "feat.", aggiungi gli artisti
+                    if (line.includes('feat.')) {
+                        currentArtists = line.split('feat.')[1].trim();
+                    } else {
+                        // Altrimenti, è il titolo della canzone
+                        if (!currentTitle) {
+                            currentTitle = line;
+                        } else {
+                            currentArtists = line;
+                        }
+                    }
+                }
+            });
+
+            // Aggiungi l'ultima canzone se esiste
+            if (currentTitle) {
+                tracklist.push({ title: currentTitle, artists: currentArtists });
+            }
 
             const uniqueTracks = [];
             tracklist.forEach(track => {
-                if (!uniqueTracks.includes(track)) {
+                if (!uniqueTracks.some(t => t.title === track.title && t.artists === track.artists)) {
                     uniqueTracks.push(track);
                 }
             });
@@ -54,7 +92,8 @@
 
             uniqueTracks.forEach((track, index) => {
                 const li = document.createElement('li');
-                li.textContent = `${index + 1}. ${track}`;
+                const artists = track.artists ? ` (feat. ${track.artists})` : '';
+                li.textContent = `${(index + 1).toString().padStart(2, '0')}. ${track.title.toLowerCase()}${artists.toLowerCase()}`;
                 tracklistElement.appendChild(li);
             });
         }
