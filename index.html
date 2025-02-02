@@ -80,23 +80,36 @@
             const lines = input.split('\n').map(line => line.trim()).filter(line => line);
 
             const tracklist = [];
-            for (let i = 0; i < lines.length; i += 3) {
-                const title = lines[i];
-                const artists = lines[i + 1].replace(/^E/, '');
-                // Ignoriamo il tempo (lines[i + 2])
-                const artistNames = artists.split(',').map(artist => artist.trim());
-                const uniqueArtists = [...new Set(artistNames)].join(', ');
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].match(/^\d+\./)) { // Match "1.", "2.", "3.", etc.
+                    const titleLine = lines[i + 1] ? lines[i + 1] : lines[i];
+                    const title = titleLine.split(' feat ')[0].trim();
+                    const artists = titleLine.split(' feat ')[1] || '';
+                    const time = titleLine.split(' ').pop().trim();
+                    const artistNames = artists.split(',').map(artist => artist.trim());
+                    const uniqueArtists = [...new Set(artistNames)].join(', ');
 
-                let featuring = '';
-                if (uniqueArtists.includes(',')) {
-                    const featuredArtists = uniqueArtists.split(',').slice(1).join(', ').trim();
-                    if (!title.toLowerCase().includes(featuredArtists.toLowerCase())) {
-                        featuring = ` (feat. ${featuredArtists})`;
+                    let featuring = '';
+                    if (uniqueArtists) {
+                        featuring = ` (feat. ${uniqueArtists})`;
                     }
-                }
 
-                const formattedTitle = `${title}${featuring}`;
-                tracklist.push(formattedTitle);
+                    const formattedTitle = `${title}${featuring}`;
+                    tracklist.push(formattedTitle);
+                } else if (lines[i].match(/^\d{2}:\d{2}$/)) { // Match "02:22", "03:01", etc.
+                    const title = lines[i - 2].split(' feat ')[0].trim();
+                    const artists = lines[i - 2].split(' feat ')[1] || '';
+                    const artistNames = artists.split(',').map(artist => artist.trim());
+                    const uniqueArtists = [...new Set(artistNames)].join(', ');
+
+                    let featuring = '';
+                    if (uniqueArtists) {
+                        featuring = ` (feat. ${uniqueArtists})`;
+                    }
+
+                    const formattedTitle = `${title}${featuring}`;
+                    tracklist.push(formattedTitle);
+                }
             }
 
             const uniqueTracks = [...new Set(tracklist)];
