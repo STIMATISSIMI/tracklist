@@ -85,60 +85,21 @@
 
             const Hehe = [];
             for (let i = 0; i < lines.length; i++) {
-                if (lines[i].match(/^\d+\./)) { // Match "1.", "2.", "3.", etc.
-                    const titleLine = lines[i + 1] ? lines[i + 1] : lines[i];
-                    const title = titleLine.split(' feat ')[0].trim();
-                    const artistsMatch = titleLine.match(/feat (.+) \d{2}:\d{2}/);
-                    const artists = artistsMatch ? artistsMatch[1] : '';
-                    const artistNames = artists.split(',').map(artist => artist.trim());
-                    const uniqueArtists = [...new Set(artistNames)].join(', ');
+                if (lines[i].match(/^\d+/)) { // Match track number
+                    const trackNumber = lines[i].match(/^\d+/)[0];
+                    const titleLine = lines[i].replace(/^\d+\s*/, '');
+                    const title = titleLine.split(' Lyrics')[0].trim().replace(/ \(.*?\)/g, '');
 
-                    let featuring = '';
-                    if (uniqueArtists) {
-                        featuring = ` (feat. ${uniqueArtists})`;
-                    }
-
-                    const formattedTitle = `${capitalizeWords(title)}${featuring}`;
-                    Hehe.push(formattedTitle);
-                } else if (lines[i].match(/^\d{2}:\d{2}$/)) { // Match "02:22", "03:01", etc.
-                    const title = lines[i - 2].split(' feat ')[0].trim();
-                    const artistsMatch = lines[i - 2].match(/feat (.+) \d{2}:\d{2}/);
-                    const artists = artistsMatch ? artistsMatch[1] : '';
-                    const artistNames = artists.split(',').map(artist => artist.trim());
-                    const uniqueArtists = [...new Set(artistNames)].join(', ');
-
-                    let featuring = '';
-                    if (uniqueArtists) {
-                        featuring = ` (feat. ${uniqueArtists})`;
-                    }
-
-                    const formattedTitle = `${capitalizeWords(title)}${featuring}`;
-                    Hehe.push(formattedTitle);
-                } else if (lines[i].match(/^\[\d{2}:\d{2}\] \d+\./)) { // Match "[04:12] 01.", etc.
-                    const titleLine = lines[i].replace(/^\[\d{2}:\d{2}\] \d+\.\s*/, '');
-                    const title = titleLine.split(' feat ')[0].trim();
-                    const artists = titleLine.split(' feat ')[1] || '';
-                    const artistNames = artists.split(',').map(artist => artist.trim());
-                    const uniqueArtists = [...new Set(artistNames)].join(', ');
-
-                    let featuring = '';
-                    if (uniqueArtists) {
-                        featuring = ` (feat. ${uniqueArtists})`;
-                    }
-
-                    const formattedTitle = `${capitalizeWords(title)}${featuring}`;
-                    Hehe.push(formattedTitle);
+                    Hehe.push(`${trackNumber}. ${capitalizeWords(title)}`);
                 }
             }
-
-            const uniqueTracks = [...new Set(Hehe)];
 
             const HeheElement = document.getElementById('Hehe');
             HeheElement.innerHTML = '';
 
-            uniqueTracks.forEach((track, index) => {
+            Hehe.forEach((track, index) => {
                 const li = document.createElement('li');
-                li.textContent = `${(index + 1).toString().padStart(2, '0')}. ${track}`;
+                li.textContent = track;
                 HeheElement.appendChild(li);
             });
         }
