@@ -63,7 +63,15 @@
                 // Ignoriamo il tempo (lines[i + 2])
                 const artistNames = artists.split(',').map(artist => artist.trim());
                 const uniqueArtists = [...new Set(artistNames)].join(', ');
-                const featuring = uniqueArtists.includes(',') ? ` (feat. ${uniqueArtists.split(',').slice(1).join(', ').trim()})` : '';
+
+                let featuring = '';
+                if (uniqueArtists.includes(',')) {
+                    const featuredArtists = uniqueArtists.split(',').slice(1).join(', ').trim();
+                    if (!title.toLowerCase().includes(featuredArtists.toLowerCase())) {
+                        featuring = ` (feat. ${featuredArtists})`;
+                    }
+                }
+
                 const formattedTitle = `${title}${featuring}`;
                 tracklist.push(formattedTitle);
             }
