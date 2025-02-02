@@ -8,21 +8,36 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            background-color: #121212;
+            color: #ffffff;
         }
         textarea {
             width: 100%;
             height: 200px;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            border: 1px solid #333333;
+            padding: 10px;
         }
         .output {
             margin-top: 20px;
             white-space: pre-wrap;
-            background-color: #f0f0f0;
+            background-color: #1e1e1e;
+            color: #ffffff;
             padding: 10px;
+            border: 1px solid #333333;
         }
         button {
             margin-top: 10px;
             padding: 10px;
             font-size: 16px;
+            background-color: #333333;
+            color: #ffffff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #444444;
         }
     </style>
 </head>
@@ -37,24 +52,30 @@
         function formatTracklist() {
             const input = document.getElementById('inputTracklist').value;
             const mainArtist = "The Weeknd"; // Sostituisci con l'artista principale
-            const lines = input.split(/(?=\d+\.\s)/); // Divide per traccia numerata
+            const lines = input.split(/\n/).filter(line => line.trim() !== ''); // Divide per newline e filtra righe vuote
             const formattedLines = [];
-            
-            lines.forEach((line, index) => {
-                if (line.trim() === '') return; // Salta le righe vuote
+            let currentTrack = '';
 
-                // Rimuove il flag di esplicitazione
-                line = line.replace(/^E\s*/, '').trim();
-                // Rimuove la numerazione esistente
+            lines.forEach((line, index) => {
+                // Rimuovi la numerazione esistente
                 line = line.replace(/^\d+\.\s*/, '').trim();
-                // Rimuove il minutaggio se presente
+                // Rimuovi il flag di esplicitazione
+                line = line.replace(/^E\s*/, '').trim();
+                // Rimuovi il minutaggio se presente
                 line = line.replace(/\d{1,2}:\d{2}/, '').trim();
-                // Rimuove l'artista principale ripetuto
+                // Rimuovi l'artista principale ripetuto
                 line = line.replace(new RegExp(`\\b${mainArtist}\\b,?\\s*`, 'gi'), '').trim();
-                // Gestisce i featuring
-                line = line.replace(/feat\./gi, '(feat.');
-                // Prepara la traccia formattata
-                formattedLines.push(`${String(index + 1).padStart(2, '0')}. ${line}`);
+                // Gestisci i featuring
+                line = line.replace(/feat\./gi, '(feat.').replace(/\s*,\s*/g, ', ').replace(/(\(feat\.[^)]+)\((feat\.[^)]+)\)/g, '$1, $2)').trim();
+
+                // Concatenare le righe se necessario
+                currentTrack += (currentTrack ? ' ' : '') + line;
+
+                // Aggiungi la traccia formattata se si tratta dell'ultima parte della traccia
+                if (index === lines.length - 1 || /^\d+\.\s/.test(lines[index + 1])) {
+                    formattedLines.push(`${String(formattedLines.length + 1).padStart(2, '0')}. ${currentTrack.trim()}`);
+                    currentTrack = '';
+                }
             });
 
             document.getElementById('outputTracklist').textContent = formattedLines.join('\n');
