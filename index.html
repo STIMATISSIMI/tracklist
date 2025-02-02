@@ -61,7 +61,9 @@
                 const title = lines[i];
                 const artists = lines[i + 1].replace(/^E/, '');
                 // Ignoriamo il tempo (lines[i + 2])
-                const featuring = artists.includes(',') ? ` (feat. ${artists.split(',').slice(1).join(', ').trim()})` : '';
+                const artistNames = artists.split(',').map(artist => artist.trim());
+                const uniqueArtists = [...new Set(artistNames)].join(', ');
+                const featuring = uniqueArtists.includes(',') ? ` (feat. ${uniqueArtists.split(',').slice(1).join(', ').trim()})` : '';
                 const formattedTitle = `${title}${featuring}`;
                 tracklist.push(formattedTitle);
             }
