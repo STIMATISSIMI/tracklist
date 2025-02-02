@@ -1,92 +1,97 @@
-<!DOCTYPE html>
-<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracklist Formatter</title>
+    <title>Tracklist Musicale</title>
+    <title>Hehe Musicale</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #121212;
-            color: #ffffff;
-        }
-        textarea {
-            width: 100%;
-            height: 200px;
-            background-color: #1e1e1e;
-            color: #ffffff;
-            border: 1px solid #333333;
-            padding: 10px;
-        }
-        .output {
-            margin-top: 20px;
-            white-space: pre-wrap;
-            background-color: #1e1e1e;
-            color: #ffffff;
-            padding: 10px;
-            border: 1px solid #333333;
-        }
-        button {
-            margin-top: 10px;
-            padding: 10px;
-            font-size: 16px;
-            background-color: #333333;
-            color: #ffffff;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #444444;
-        }
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+@@ -69,21 +69,21 @@
     </style>
 </head>
 <body>
-    <h1>Tracklist Formatter</h1>
-    <textarea id="inputTracklist" placeholder="Incolla qui la tracklist..."></textarea>
-    <button onclick="formatTracklist()">Formatta Tracklist</button>
-    <button onclick="copyToClipboard()">Copia Tracklist</button>
-    <div class="output" id="outputTracklist"></div>
+    <h1>Tracklist Musicale <span>v. 1.04</span></h1>
+    <textarea id="inputTracklist" placeholder="Inserisci la tracklist da Spotify qui..."></textarea>
+    <h1>Hehe Musicale <span>v. 1.04</span></h1>
+    <textarea id="inputHehe" placeholder="Inserisci la Hehe da Anche No qui..."></textarea>
+    <div class="button-container">
+        <button onclick="processTracklist()">Correggi Tracklist</button>
+        <button onclick="copyTracklist()">Copia Tracklist</button>
+        <button onclick="processHehe()">Correggi Hehe</button>
+        <button onclick="copyHehe()">Copia Hehe</button>
+    </div>
+    <h2>Tracklist Corretta</h2>
+    <ul id="tracklist"></ul>
+    <h2>Hehe Corretta</h2>
+    <ul id="Hehe"></ul>
 
     <script>
-        function formatTracklist() {
+        function processTracklist() {
             const input = document.getElementById('inputTracklist').value;
-            const mainArtist = "The Weeknd"; // Sostituisci con l'artista principale
-            const lines = input.split(/\n/).filter(line => line.trim() !== ''); // Divide per newline e filtra righe vuote
-            const formattedLines = [];
-            let currentTrack = '';
+        function processHehe() {
+            const input = document.getElementById('inputHehe').value;
+            const lines = input.split('\n').map(line => line.trim()).filter(line => line);
 
-            lines.forEach((line, index) => {
-                // Rimuove la numerazione esistente
-                line = line.replace(/^\d+\.\s*/, '').trim();
-                // Rimuove il flag di esplicitazione
-                line = line.replace(/^E\s*/, '').trim();
-                // Rimuove il minutaggio se presente
-                line = line.replace(/\d{1,2}:\d{2}/, '').trim();
-                // Rimuove l'artista principale ripetuto
-                line = line.replace(new RegExp(`\\b${mainArtist}\\b,?\\s*`, 'gi'), '').trim();
-                // Gestisce i featuring
-                line = line.replace(/feat\./gi, '(feat.').replace(/\s*,\s*/g, ', ').replace(/(\(feat\.[^)]+)\((feat\.[^)]+)\)/g, '$1, $2)').trim();
+            const tracklist = [];
+            const Hehe = [];
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].match(/^\d+\./)) { // Match "1.", "2.", "3.", etc.
+                    const titleLine = lines[i + 1] ? lines[i + 1] : lines[i];
+@@ -99,7 +99,7 @@ <h2>Tracklist Corretta</h2>
+                    }
 
-                // Concatenare le righe se necessario
-                currentTrack += (currentTrack ? ' ' : '') + line;
+                    const formattedTitle = `${capitalizeWords(title)}${featuring}`;
+                    tracklist.push(formattedTitle);
+                    Hehe.push(formattedTitle);
+                } else if (lines[i].match(/^\d{2}:\d{2}$/)) { // Match "02:22", "03:01", etc.
+                    const title = lines[i - 2].split(' feat ')[0].trim();
+                    const artistsMatch = lines[i - 2].match(/feat (.+) \d{2}:\d{2}/);
+@@ -113,7 +113,7 @@ <h2>Tracklist Corretta</h2>
+                    }
 
-                // Aggiungi la traccia formattata se si tratta dell'ultima parte della traccia
-                if (index === lines.length - 1 || /^\d+\.\s/.test(lines[index + 1])) {
-                    formattedLines.push(`${String(formattedLines.length + 1).padStart(2, '0')}. ${currentTrack.trim()}`);
-                    currentTrack = '';
+                    const formattedTitle = `${capitalizeWords(title)}${featuring}`;
+                    tracklist.push(formattedTitle);
+                    Hehe.push(formattedTitle);
+                } else if (lines[i].match(/^\[\d{2}:\d{2}\] \d+\./)) { // Match "[04:12] 01.", etc.
+                    const titleLine = lines[i].replace(/^\[\d{2}:\d{2}\] \d+\.\s*/, '');
+                    const title = titleLine.split(' feat ')[0].trim();
+@@ -127,30 +127,30 @@ <h2>Tracklist Corretta</h2>
+                    }
+
+                    const formattedTitle = `${capitalizeWords(title)}${featuring}`;
+                    tracklist.push(formattedTitle);
+                    Hehe.push(formattedTitle);
                 }
-            });
+            }
 
-            document.getElementById('outputTracklist').textContent = formattedLines.join('\n');
+            const uniqueTracks = [...new Set(tracklist)];
+            const uniqueTracks = [...new Set(Hehe)];
+
+            const tracklistElement = document.getElementById('tracklist');
+            tracklistElement.innerHTML = '';
+            const HeheElement = document.getElementById('Hehe');
+            HeheElement.innerHTML = '';
+
+            uniqueTracks.forEach((track, index) => {
+                const li = document.createElement('li');
+                li.textContent = `${(index + 1).toString().padStart(2, '0')}. ${track}`;
+                tracklistElement.appendChild(li);
+                HeheElement.appendChild(li);
+            });
         }
 
-        function copyToClipboard() {
-            const outputTracklist = document.getElementById('outputTracklist').textContent;
-            navigator.clipboard.writeText(outputTracklist).catch(err => {
-                console.error('Errore nel copiare la tracklist: ', err);
-            });
+        function capitalizeWords(str) {
+            return str.replace(/\b\w/g, char => char.toUpperCase());
+        }
+
+        function copyTracklist() {
+            const tracklistElement = document.getElementById('tracklist');
+            const tracklistText = Array.from(tracklistElement.children).map(li => li.textContent).join('\n');
+            navigator.clipboard.writeText(tracklistText);
+        function copyHehe() {
+            const HeheElement = document.getElementById('Hehe');
+            const HeheText = Array.from(HeheElement.children).map(li => li.textContent).join('\n');
+            navigator.clipboard.writeText(HeheText);
         }
     </script>
 </body>
-</html>
