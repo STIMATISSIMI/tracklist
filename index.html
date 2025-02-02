@@ -57,15 +57,15 @@
             let currentTrack = '';
 
             lines.forEach((line, index) => {
-                // Rimuovi la numerazione esistente
+                // Rimuove la numerazione esistente
                 line = line.replace(/^\d+\.\s*/, '').trim();
-                // Rimuovi il flag di esplicitazione
+                // Rimuove il flag di esplicitazione
                 line = line.replace(/^E\s*/, '').trim();
-                // Rimuovi il minutaggio se presente
+                // Rimuove il minutaggio se presente
                 line = line.replace(/\d{1,2}:\d{2}/, '').trim();
-                // Rimuovi l'artista principale ripetuto
+                // Rimuove l'artista principale ripetuto
                 line = line.replace(new RegExp(`\\b${mainArtist}\\b,?\\s*`, 'gi'), '').trim();
-                // Gestisci i featuring
+                // Gestisce i featuring
                 line = line.replace(/feat\./gi, '(feat.').replace(/\s*,\s*/g, ', ').replace(/(\(feat\.[^)]+)\((feat\.[^)]+)\)/g, '$1, $2)').trim();
 
                 // Concatenare le righe se necessario
@@ -83,9 +83,7 @@
 
         function copyToClipboard() {
             const outputTracklist = document.getElementById('outputTracklist').textContent;
-            navigator.clipboard.writeText(outputTracklist).then(() => {
-                alert('Tracklist copiata negli appunti!');
-            }).catch(err => {
+            navigator.clipboard.writeText(outputTracklist).catch(err => {
                 console.error('Errore nel copiare la tracklist: ', err);
             });
         }
