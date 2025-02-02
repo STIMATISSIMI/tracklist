@@ -58,12 +58,16 @@
             padding: 10px;
             border-radius: 5px;
         }
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
     </style>
 </head>
 <body>
     <h1>Tracklist Musicale</h1>
     <textarea id="inputTracklist" placeholder="Inserisci la tracklist da Spotify qui..."></textarea>
-    <div>
+    <div class="button-container">
         <button onclick="processTracklist()">Correggi Tracklist</button>
         <button onclick="copyTracklist()">Copia Tracklist</button>
     </div>
@@ -110,11 +114,7 @@
         function copyTracklist() {
             const tracklistElement = document.getElementById('tracklist');
             const tracklistText = Array.from(tracklistElement.children).map(li => li.textContent).join('\n');
-            navigator.clipboard.writeText(tracklistText).then(() => {
-                alert('Tracklist copiata negli appunti!');
-            }, (err) => {
-                alert('Errore durante la copia della tracklist: ', err);
-            });
+            navigator.clipboard.writeText(tracklistText);
         }
     </script>
 </body>
