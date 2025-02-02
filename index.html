@@ -84,8 +84,8 @@
                 if (lines[i].match(/^\d+\./)) { // Match "1.", "2.", "3.", etc.
                     const titleLine = lines[i + 1] ? lines[i + 1] : lines[i];
                     const title = titleLine.split(' feat ')[0].trim();
-                    const artists = titleLine.split(' feat ')[1] || '';
-                    const time = titleLine.split(' ').pop().trim();
+                    const artistsMatch = titleLine.match(/feat (.+) \d{2}:\d{2}/);
+                    const artists = artistsMatch ? artistsMatch[1] : '';
                     const artistNames = artists.split(',').map(artist => artist.trim());
                     const uniqueArtists = [...new Set(artistNames)].join(', ');
 
@@ -94,11 +94,12 @@
                         featuring = ` (feat. ${uniqueArtists})`;
                     }
 
-                    const formattedTitle = `${title}${featuring}`;
+                    const formattedTitle = `${capitalizeWords(title)}${featuring}`;
                     tracklist.push(formattedTitle);
                 } else if (lines[i].match(/^\d{2}:\d{2}$/)) { // Match "02:22", "03:01", etc.
                     const title = lines[i - 2].split(' feat ')[0].trim();
-                    const artists = lines[i - 2].split(' feat ')[1] || '';
+                    const artistsMatch = lines[i - 2].match(/feat (.+) \d{2}:\d{2}/);
+                    const artists = artistsMatch ? artistsMatch[1] : '';
                     const artistNames = artists.split(',').map(artist => artist.trim());
                     const uniqueArtists = [...new Set(artistNames)].join(', ');
 
@@ -107,7 +108,7 @@
                         featuring = ` (feat. ${uniqueArtists})`;
                     }
 
-                    const formattedTitle = `${title}${featuring}`;
+                    const formattedTitle = `${capitalizeWords(title)}${featuring}`;
                     tracklist.push(formattedTitle);
                 }
             }
@@ -122,6 +123,10 @@
                 li.textContent = `${(index + 1).toString().padStart(2, '0')}. ${track}`;
                 tracklistElement.appendChild(li);
             });
+        }
+
+        function capitalizeWords(str) {
+            return str.replace(/\b\w/g, char => char.toUpperCase());
         }
 
         function copyTracklist() {
